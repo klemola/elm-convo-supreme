@@ -2,16 +2,18 @@ module ConvoSupreme (..) where
 
 import Html exposing (..)
 import InputArea
+import Messages
 
 
 type Action
   = InputAreaAction InputArea.Action
+  | MessagesAction Messages.Action
 
 
 type alias Model =
   { inputModel : InputArea.Model
   , title : String
-  , messages : List String
+  , messagesModel : Messages.Model
   }
 
 
@@ -19,7 +21,7 @@ init : Model
 init =
   { inputModel = InputArea.init
   , title = "Convo Supreme"
-  , messages = []
+  , messagesModel = Messages.init
   }
 
 
@@ -30,7 +32,7 @@ update action model =
       case inputAction of
         InputArea.SendMessage message ->
           { model
-            | messages = message :: model.messages
+            | messagesModel = Messages.update (Messages.ReceiveMessage message) model.messagesModel
             , inputModel = InputArea.update inputAction model.inputModel
           }
 
@@ -39,6 +41,9 @@ update action model =
             | inputModel = InputArea.update inputAction model.inputModel
           }
 
+    _ ->
+      model
+
 
 view : Signal.Address Action -> Model -> Html
 view address model =
@@ -46,5 +51,5 @@ view address model =
     []
     [ h1 [] [ text model.title ]
     , InputArea.view (Signal.forwardTo address InputAreaAction) model.inputModel
-    , text (toString model.messages)
+    , Messages.view model.messagesModel
     ]
