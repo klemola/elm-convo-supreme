@@ -1,14 +1,15 @@
 module Messages (..) where
 
 import Html exposing (..)
+import Message
 
 
 type Action
-  = ReceiveMessage String
+  = ReceiveMessage Message.Model
 
 
 type alias Model =
-  { messages : List String }
+  { messages : List Message.Model }
 
 
 init : Model
@@ -26,4 +27,9 @@ update action model =
 
 view : Model -> Html
 view model =
-  text (toString model.messages)
+  ul
+    []
+    (model.messages
+      |> List.reverse
+      |> List.map Message.view
+    )

@@ -3,6 +3,7 @@ module ConvoSupreme (..) where
 import Html exposing (..)
 import InputArea
 import Messages
+import Message
 
 
 type Action
@@ -11,16 +12,16 @@ type Action
 
 
 type alias Model =
-  { inputModel : InputArea.Model
-  , title : String
+  { title : String
+  , inputModel : InputArea.Model
   , messagesModel : Messages.Model
   }
 
 
 init : Model
 init =
-  { inputModel = InputArea.init
-  , title = "Convo Supreme"
+  { title = "Convo Supreme"
+  , inputModel = InputArea.init
   , messagesModel = Messages.init
   }
 
@@ -30,9 +31,9 @@ update action model =
   case action of
     InputAreaAction inputAction ->
       case inputAction of
-        InputArea.SendMessage message ->
+        InputArea.SendMessage input ->
           { model
-            | messagesModel = Messages.update (Messages.ReceiveMessage message) model.messagesModel
+            | messagesModel = Messages.update (Messages.ReceiveMessage (createMessage input)) model.messagesModel
             , inputModel = InputArea.update inputAction model.inputModel
           }
 
@@ -43,6 +44,14 @@ update action model =
 
     _ ->
       model
+
+
+createMessage : String -> Message.Model
+createMessage input =
+  { content = input
+  , sentOn = 0
+  , sentBy = "User"
+  }
 
 
 view : Signal.Address Action -> Model -> Html
