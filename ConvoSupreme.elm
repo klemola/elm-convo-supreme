@@ -1,6 +1,7 @@
 module ConvoSupreme (..) where
 
 import Html exposing (..)
+import Html.Attributes exposing (style)
 import InputArea
 import Messages
 import Message
@@ -54,11 +55,56 @@ createMessage input =
   }
 
 
+headerBlock : String -> Html
+headerBlock title =
+  header
+    [ style
+        [ ( "flex-basis", "4rem" )
+        , ( "flex-shrink", "0" )
+        , ( "background", "#f5f5f5" )
+        , ( "border-bottom", "0.2rem solid #e5e5e5" )
+        , ( "text-align", "center" )
+        ]
+    ]
+    [ h2 [] [ text title ] ]
+
+
+messagesBlock : Messages.Model -> Html
+messagesBlock messages =
+  div
+    [ style
+        [ ( "flex", "1" )
+        , ( "overflow-y", "scroll" )
+        ]
+    ]
+    [ Messages.view messages ]
+
+
+inputBlock : Signal.Address Action -> InputArea.Model -> Html
+inputBlock address model =
+  div
+    [ style
+        [ ( "flex-basis", "3rem" )
+        , ( "flex-shrink", "0" )
+        , ( "padding", "0.5rem" )
+        , ( "background", "#f5f5f5" )
+        , ( "border-top", "0.2rem solid #e5e5e5" )
+        ]
+    ]
+    [ InputArea.view (Signal.forwardTo address InputAreaAction) model ]
+
+
 view : Signal.Address Action -> Model -> Html
 view address model =
   div
-    []
-    [ h1 [] [ text model.title ]
-    , InputArea.view (Signal.forwardTo address InputAreaAction) model.inputModel
-    , Messages.view model.messagesModel
+    [ style
+        [ ( "color", "#333" )
+        , ( "display", "flex" )
+        , ( "flex-direction", "column" )
+        , ( "min-height", "100vh" )
+        ]
+    ]
+    [ headerBlock model.title
+    , messagesBlock model.messagesModel
+    , inputBlock address model.inputModel
     ]

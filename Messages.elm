@@ -1,6 +1,7 @@
 module Messages (..) where
 
 import Html exposing (..)
+import Html.Attributes exposing (style)
 import Message
 
 
@@ -28,7 +29,12 @@ update action model =
 view : Model -> Html
 view model =
   ul
-    []
+    [ style
+        [ ( "list-style", "none" )
+        , ( "padding", "0" )
+        , ( "margin", "0" )
+        ]
+    ]
     (model.messages
       |> List.reverse
       |> List.map Message.view

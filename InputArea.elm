@@ -31,19 +31,19 @@ update action model =
       init
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
-  div
-    []
-    [ userInput address model
-    , sendMessage address model
-    ]
-
-
 userInput : Signal.Address Action -> Model -> Html
 userInput address model =
   input
-    [ placeholder "Your message..."
+    [ style
+        [ ( "flex", "5" )
+        , ( "height", "2.5rem" )
+        , ( "padding", "0.25rem 0.5rem" )
+        , ( "font-size", "1em" )
+        , ( "border", "none" )
+        , ( "border-radius", "0.5rem" )
+        , ( "margin-right", "0.5rem" )
+        ]
+    , placeholder "Your message..."
     , autofocus True
     , value model.input
     , on "input" targetValue (\str -> Signal.message address (Input str))
@@ -54,5 +54,24 @@ userInput address model =
 sendMessage : Signal.Address Action -> Model -> Html
 sendMessage address model =
   button
-    [ onClick address (SendMessage model.input) ]
+    [ onClick address (SendMessage model.input)
+    , style
+        [ ( "flex", "1" )
+        , ( "height", "3rem" )
+        , ( "font-size", "1.5em" )
+        , ( "border", "none" )
+        , ( "background", "lightblue" )
+        , ( "color", "#345B80" )
+        , ( "border-radius", "0.5rem" )
+        ]
+    ]
     [ text ">" ]
+
+
+view : Signal.Address Action -> Model -> Html
+view address model =
+  div
+    [ style [ ( "display", "flex" ) ] ]
+    [ userInput address model
+    , sendMessage address model
+    ]
