@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Signal exposing (Address)
+import Effects exposing (Effects)
 
 
 type Action
@@ -12,26 +13,25 @@ type Action
 
 
 type alias Model =
-  { input : String }
+  String
 
 
 init : Model
 init =
-  { input = ""
-  }
+  ""
 
 
-update : Action -> Model -> Model
+update : Action -> Model -> ( Model, Effects Action )
 update action model =
   case action of
-    Input value ->
-      { model | input = value }
+    Input text ->
+      ( text, Effects.none )
 
     SendMessage _ ->
-      init
+      ( init, Effects.none )
 
 
-userInput : Signal.Address Action -> Model -> Html
+userInput : Signal.Address Action -> String -> Html
 userInput address model =
   input
     [ style
@@ -45,16 +45,16 @@ userInput address model =
         ]
     , placeholder "Your message..."
     , autofocus True
-    , value model.input
+    , value model
     , on "input" targetValue (\str -> Signal.message address (Input str))
     ]
     []
 
 
-sendMessage : Signal.Address Action -> Model -> Html
+sendMessage : Signal.Address Action -> String -> Html
 sendMessage address model =
   button
-    [ onClick address (SendMessage model.input)
+    [ onClick address (SendMessage model)
     , style
         [ ( "flex", "1" )
         , ( "height", "3rem" )

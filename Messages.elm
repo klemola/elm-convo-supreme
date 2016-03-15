@@ -10,20 +10,19 @@ type Action
 
 
 type alias Model =
-  { messages : List Message.Model }
+  List Message.Model
 
 
 init : Model
 init =
-  { messages = []
-  }
+  []
 
 
 update : Action -> Model -> Model
 update action model =
   case action of
     ReceiveMessage message ->
-      { model | messages = message :: model.messages }
+      message :: model
 
 
 view : Model -> Html
@@ -35,7 +34,7 @@ view model =
         , ( "margin", "0" )
         ]
     ]
-    (model.messages
+    (model
       |> List.reverse
       |> List.map Message.view
     )

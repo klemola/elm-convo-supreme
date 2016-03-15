@@ -2,14 +2,18 @@ module ConvoSupreme (..) where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
+import Time exposing (Time)
+import Effects exposing (Effects)
+import Task
+import TaskTutorial
 import InputArea
 import Messages
 import Message
 
 
 type Action
-  = InputAreaAction InputArea.Action
-  | MessagesAction Messages.Action
+  = CreateMessage ( Time, String )
+  | InputAreaAction InputArea.Action
 
 
 type alias Model =
@@ -19,38 +23,57 @@ type alias Model =
   }
 
 
-init : Model
-init =
-  { title = "Convo Supreme"
-  , inputModel = InputArea.init
-  , messagesModel = Messages.init
-  }
+init : String -> ( Model, Effects Action )
+init title =
+  ( (Model title "" Messages.init), Effects.none )
 
 
-update : Action -> Model -> Model
+update : Action -> Model -> ( Model, Effects Action )
 update action model =
   case action of
+    CreateMessage ( time, content ) ->
+      ( { model
+          | messagesModel = Messages.update (Messages.ReceiveMessage (createMessage content time)) model.messagesModel
+        }
+      , Effects.none
+      )
+
     InputAreaAction inputAction ->
-      case inputAction of
-        InputArea.SendMessage input ->
-          { model
-            | messagesModel = Messages.update (Messages.ReceiveMessage (createMessage input)) model.messagesModel
-            , inputModel = InputArea.update inputAction model.inputModel
-          }
-
-        _ ->
-          { model
-            | inputModel = InputArea.update inputAction model.inputModel
-          }
-
-    _ ->
-      model
+      handleInput inputAction model
 
 
-createMessage : String -> Message.Model
-createMessage input =
+handleInput : InputArea.Action -> Model -> ( Model, Effects Action )
+handleInput action model =
+  case action of
+    InputArea.SendMessage msg ->
+      ( { model
+          | inputModel = InputArea.init
+        }
+      , doCreateMessage msg
+      )
+
+    InputArea.Input text ->
+      let
+        ( inputModel, fx ) =
+          InputArea.update action text
+      in
+        ( { model | inputModel = inputModel }, Effects.none )
+
+
+doCreateMessage : String -> Effects Action
+doCreateMessage message =
+  TaskTutorial.getCurrentTime
+    |> (flip Task.andThen)
+        (\time ->
+          Task.succeed (CreateMessage ( time, message ))
+        )
+    |> Effects.task
+
+
+createMessage : String -> Time -> Message.Model
+createMessage input timestamp =
   { content = input
-  , sentOn = 0
+  , sentOn = timestamp
   , sentBy = "User"
   }
 
