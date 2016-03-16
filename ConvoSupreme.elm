@@ -45,23 +45,23 @@ update action model =
 handleInput : InputArea.Action -> Model -> ( Model, Effects Action )
 handleInput action model =
   case action of
-    InputArea.SendMessage msg ->
+    InputArea.SendMessage content ->
       ( { model
           | inputModel = InputArea.init
         }
-      , doCreateMessage msg
+      , triggerCreateMessage content
       )
 
-    InputArea.Input text ->
+    InputArea.Input content ->
       let
         ( inputModel, fx ) =
-          InputArea.update action text
+          InputArea.update action content
       in
         ( { model | inputModel = inputModel }, Effects.none )
 
 
-doCreateMessage : String -> Effects Action
-doCreateMessage message =
+triggerCreateMessage : String -> Effects Action
+triggerCreateMessage message =
   TaskTutorial.getCurrentTime
     |> (flip Task.andThen)
         (\time ->
