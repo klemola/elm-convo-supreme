@@ -5,6 +5,7 @@ import Html.Attributes exposing (style)
 import Time exposing (Time)
 import Effects exposing (Effects)
 import Task
+import Signal
 import TaskTutorial
 import InputArea
 import Messages
@@ -13,6 +14,7 @@ import Message
 
 type Action
   = CreateMessage ( Time, String )
+  | ReceiveMessage Message.Model
   | InputAreaAction InputArea.Action
 
 
@@ -34,6 +36,13 @@ update action model =
     CreateMessage ( time, content ) ->
       ( { model
           | messagesModel = Messages.update (Messages.ReceiveMessage (createMessage content time)) model.messagesModel
+        }
+      , Effects.none
+      )
+
+    ReceiveMessage message ->
+      ( { model
+          | messagesModel = Messages.update (Messages.ReceiveMessage message) model.messagesModel
         }
       , Effects.none
       )
