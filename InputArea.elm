@@ -5,7 +5,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Signal exposing (Address)
 import Effects exposing (Effects)
-import Json.Decode as Json
+import Helpers exposing (onEnter)
 
 
 type Action
@@ -30,22 +30,6 @@ update action model =
 
     SendMessage _ ->
       ( init, Effects.none )
-
-
-onEnter : Address a -> a -> Attribute
-onEnter address value =
-  on
-    "keydown"
-    (Json.customDecoder keyCode is13)
-    (\_ -> Signal.message address value)
-
-
-is13 : Int -> Result String ()
-is13 code =
-  if code == 13 then
-    Ok ()
-  else
-    Err "not the right key code"
 
 
 userInput : Signal.Address Action -> String -> Html
