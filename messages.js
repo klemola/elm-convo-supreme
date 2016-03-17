@@ -1,13 +1,13 @@
 var initPorts = function (app) {
-  app.ports.postMessage.subscribe(function(message) {
-    app.ports.receiveMessage.send(message);
-  });
+  var socket = new WebSocket("ws://localhost:3000", "echo-protocol");
 
-  window.setInterval(function () {
-    app.ports.receiveMessage.send({
-      content: 'Hello',
-      sentOn: new Date().getTime(),
-      sentBy: 'Someone'
+  socket.onopen = function (event) {
+    app.ports.postMessage.subscribe(function(message) {
+      socket.send(JSON.stringify(message));
     });
-  }, 10000)
+  };
+
+  socket.onmessage = function(msg) {
+    app.ports.receiveMessage.send(JSON.parse(msg.data));
+  };
 };
