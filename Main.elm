@@ -24,6 +24,11 @@ main =
 
 
 port receiveMessage : Signal Message.Model
+port postMessage : Signal Message.Model
+port postMessage =
+  Message.signal
+
+
 port tasks : Signal (Task.Task Never ())
 port tasks =
   app.tasks

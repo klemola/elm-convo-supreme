@@ -5,6 +5,8 @@ import Html.Attributes exposing (style)
 import Time exposing (..)
 import Date
 import String
+import Signal
+import Task
 
 
 type alias Model =
@@ -12,6 +14,21 @@ type alias Model =
   , sentOn : Time
   , sentBy : String
   }
+
+
+box : Signal.Mailbox Model
+box =
+  Signal.mailbox (Model "" 0 "")
+
+
+signal : Signal Model
+signal =
+  box.signal
+
+
+post : String -> Time -> Task.Task a ()
+post content time =
+  Signal.send box.address (Model content time "User")
 
 
 msgTime : Time -> String

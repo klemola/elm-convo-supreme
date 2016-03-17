@@ -25,7 +25,9 @@
       sentOn : 0,
       sentBy : ''
     }
-    var app = Elm.fullscreen(Elm.Main, {receiveMessage: message})
+    var app = Elm.fullscreen(Elm.Main, {
+      receiveMessage: message
+    })
     initPorts(app);
   </script>
 </body>

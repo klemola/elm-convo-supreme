@@ -15,6 +15,7 @@ import Message
 type Action
   = CreateMessage ( Time, String )
   | ReceiveMessage Message.Model
+  | PostMessage
   | InputAreaAction InputArea.Action
 
 
@@ -34,11 +35,14 @@ update : Action -> Model -> ( Model, Effects Action )
 update action model =
   case action of
     CreateMessage ( time, content ) ->
-      ( { model
-          | messagesModel = Messages.update (Messages.ReceiveMessage (createMessage content time)) model.messagesModel
-        }
-      , Effects.none
-      )
+      let
+        task =
+          Message.post content time
+      in
+        ( model, (task |> Effects.task |> Effects.map (always PostMessage)) )
+
+    PostMessage ->
+      ( model, Effects.none )
 
     ReceiveMessage message ->
       ( { model
@@ -77,14 +81,6 @@ triggerCreateMessage message =
           Task.succeed (CreateMessage ( time, message ))
         )
     |> Effects.task
-
-
-createMessage : String -> Time -> Message.Model
-createMessage input timestamp =
-  { content = input
-  , sentOn = timestamp
-  , sentBy = "User"
-  }
 
 
 headerBlock : String -> Html
