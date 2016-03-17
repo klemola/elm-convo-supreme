@@ -4,31 +4,18 @@
   <meta charset="UTF-8">
   <title>Convo Supreme</title>
   <meta name="viewport" content="width=device-width,user-scalable=0">
-  <style>
-    html, body {
-      height: 100%;
-      min-height: 100%;
-      padding: 0;
-      margin: 0;
-    }
-    body {
-      font-family: "San Francisco", "Helvetica Neue", Helvetica, sans-serif;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div id="modal">
+    <div id="modalContent">
+      <h1>Convo Supreme</h1>
+      <input type="text" id="username" placeholder="Enter your name...">
+      <button id="logIn">Log in</button>
+    </div>
+  </div>
+  <div id="app"></div>
   <script src="elm.js"></script>
-  <script src="messages.js"></script>
-  <script>
-    var message = {
-      content : '',
-      sentOn : 0,
-      sentBy : ''
-    }
-    var app = Elm.fullscreen(Elm.Main, {
-      receiveMessage: message
-    })
-    initPorts(app);
-  </script>
+  <script src="setup.js"></script>
 </body>
 </html>
