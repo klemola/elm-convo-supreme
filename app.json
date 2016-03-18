@@ -2,11 +2,11 @@
     "name": "Convo Supreme",
     "repository": "https://github.com/klemola/elm-convo-supreme",
     "env": {
-        "ELM_COMPILE": "elm make Main.elm --output=elm.js"
+        "ELM_COMPILE": "elm make Main.elm --output=html/elm.js"
     },
     "buildpacks": [
         {
-            "url": "https://github.com/srid/heroku-buildpack-elm.git"
+            "url": "https://github.com/srid/heroku-buildpack-elm"
         },
         {
             "url": "https://github.com/hone/heroku-buildpack-static"
