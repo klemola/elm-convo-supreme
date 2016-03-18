@@ -16,11 +16,13 @@ type Action
   = CreateMessage ( Time, String )
   | ReceiveMessage Message.Model
   | PostMessage
+  | SetUser String
   | InputAreaAction InputArea.Action
 
 
 type alias Model =
   { title : String
+  , username : String
   , inputModel : InputArea.Model
   , messagesModel : Messages.Model
   }
@@ -28,7 +30,7 @@ type alias Model =
 
 init : String -> ( Model, Effects Action )
 init title =
-  ( (Model title "" Messages.init), Effects.none )
+  ( (Model title "" "" Messages.init), Effects.none )
 
 
 update : Action -> Model -> ( Model, Effects Action )
@@ -37,7 +39,7 @@ update action model =
     CreateMessage ( time, content ) ->
       let
         task =
-          Message.post content time
+          Message.post (Message.Model content time model.username)
       in
         ( model, (task |> Effects.task |> Effects.map (always PostMessage)) )
 
@@ -50,6 +52,9 @@ update action model =
         }
       , Effects.none
       )
+
+    SetUser name ->
+      ( { model | username = name }, Effects.none )
 
     InputAreaAction inputAction ->
       handleInput inputAction model

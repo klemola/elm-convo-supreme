@@ -1,4 +1,4 @@
-(function (context, app) {
+(function (context) {
   var initMessage = {
     content : '',
     sentOn : 0,
@@ -9,10 +9,10 @@
   var usernameInputEl = context.querySelector('#username');
   var logInEl = context.querySelector('#logIn');
   var socket = new WebSocket("ws://localhost:3000", "echo-protocol");
-  var user;
 
   var app = Elm.embed(Elm.Main, appEl, {
-    receiveMessage: initMessage
+    receiveMessage: initMessage,
+    username: ''
   })
 
   socket.onopen = function (event) {
@@ -25,7 +25,7 @@
     app.ports.receiveMessage.send(JSON.parse(msg.data));
   };
 
-  logInEl.onclick = logIn
+  logInEl.onclick = logIn;
   usernameInputEl.onkeyup = function(event) {
     if (event.keyCode == 13) {
       logIn();
@@ -33,7 +33,7 @@
   };
 
   function logIn () {
-    user = usernameInputEl.value;
+    app.ports.username.send(usernameInputEl.value || 'WebUser');
     modalEl.setAttribute('class', 'hidden');
   }
 

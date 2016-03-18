@@ -14,7 +14,10 @@ app =
     { init = init "Convo Supreme"
     , update = update
     , view = view
-    , inputs = [ Signal.map (\message -> ConvoSupreme.ReceiveMessage message) receiveMessage ]
+    , inputs =
+        [ (Signal.map (\message -> ConvoSupreme.ReceiveMessage message) receiveMessage)
+        , (Signal.map (\username -> ConvoSupreme.SetUser username) username)
+        ]
     }
 
 
@@ -23,6 +26,7 @@ main =
   app.html
 
 
+port username : Signal String
 port receiveMessage : Signal Message.Model
 port postMessage : Signal Message.Model
 port postMessage =

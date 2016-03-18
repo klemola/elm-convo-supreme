@@ -26,9 +26,9 @@ signal =
   box.signal
 
 
-post : String -> Time -> Task.Task a ()
-post content time =
-  Signal.send box.address (Model content time "User")
+post : Model -> Task.Task a ()
+post message =
+  Signal.send box.address message
 
 
 msgTime : Time -> String
