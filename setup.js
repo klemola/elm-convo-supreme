@@ -8,7 +8,7 @@
   var modalEl = context.querySelector('#modal');
   var usernameInputEl = context.querySelector('#username');
   var logInEl = context.querySelector('#logIn');
-  var socket = new WebSocket('ws://'+ location.hostname + ':3000', 'echo-protocol');
+  var socket = new WebSocket('ws://test-ws-chat.herokuapp.com', 'echo-protocol');
 
   var app = Elm.embed(Elm.Main, appEl, {
     receiveMessage: initMessage,
