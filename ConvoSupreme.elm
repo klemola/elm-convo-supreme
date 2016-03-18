@@ -129,7 +129,8 @@ view address model =
         [ ( "color", "#333" )
         , ( "display", "flex" )
         , ( "flex-direction", "column" )
-        , ( "min-height", "100vh" )
+        , ( "height", "100%" )
+        , ( "min-height", "100%" )
         ]
     ]
     [ headerBlock model.title
