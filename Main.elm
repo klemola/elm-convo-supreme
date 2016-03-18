@@ -6,6 +6,7 @@ import Html exposing (Html)
 import Task
 import ConvoSupreme exposing (init, update, view)
 import Message
+import Scroll
 
 
 app : StartApp.App ConvoSupreme.Model
@@ -31,6 +32,11 @@ port receiveMessage : Signal Message.Model
 port postMessage : Signal Message.Model
 port postMessage =
   Message.signal
+
+
+port scroll : Signal String
+port scroll =
+  Scroll.signal
 
 
 port tasks : Signal (Task.Task Never ())

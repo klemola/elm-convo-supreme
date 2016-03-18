@@ -1,12 +1,13 @@
 module Messages (..) where
 
 import Html exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, id)
+import Effects exposing (Effects)
 import Message
 
 
 type Action
-  = ReceiveMessage Message.Model
+  = AddMessage Message.Model
 
 
 type alias Model =
@@ -18,11 +19,16 @@ init =
   []
 
 
-update : Action -> Model -> Model
+componentId : String
+componentId =
+  "messagesList"
+
+
+update : Action -> Model -> ( Model, Effects Action )
 update action model =
   case action of
-    ReceiveMessage message ->
-      message :: model
+    AddMessage message ->
+      ( message :: model, Effects.none )
 
 
 view : Model -> Html
@@ -33,6 +39,7 @@ view model =
         , ( "padding", "0" )
         , ( "margin", "0" )
         ]
+    , id componentId
     ]
     (model
       |> List.reverse

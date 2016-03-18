@@ -10,14 +10,15 @@ import TaskTutorial
 import InputArea
 import Messages
 import Message
+import Scroll
 
 
 type Action
   = CreateMessage ( Time, String )
   | ReceiveMessage Message.Model
-  | PostMessage
   | SetUser String
   | InputAreaAction InputArea.Action
+  | NoOp
 
 
 type alias Model =
@@ -41,23 +42,33 @@ update action model =
         task =
           Message.post (Message.Model content time model.username)
       in
-        ( model, (task |> Effects.task |> Effects.map (always PostMessage)) )
-
-    PostMessage ->
-      ( model, Effects.none )
+        ( model, (doNothing task) )
 
     ReceiveMessage message ->
-      ( { model
-          | messagesModel = Messages.update (Messages.ReceiveMessage message) model.messagesModel
-        }
-      , Effects.none
-      )
+      let
+        ( messagesModel, fx ) =
+          Messages.update (Messages.AddMessage message) model.messagesModel
+
+        task =
+          Scroll.scroll Messages.componentId
+      in
+        ( { model | messagesModel = messagesModel }, (doNothing task) )
 
     SetUser name ->
       ( { model | username = name }, Effects.none )
 
     InputAreaAction inputAction ->
       handleInput inputAction model
+
+    _ ->
+      ( model, Effects.none )
+
+
+doNothing : Task.Task Effects.Never a -> Effects Action
+doNothing task =
+  task
+    |> Effects.task
+    |> Effects.map (always NoOp)
 
 
 handleInput : InputArea.Action -> Model -> ( Model, Effects Action )

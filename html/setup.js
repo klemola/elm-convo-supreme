@@ -9,13 +9,17 @@
   var usernameInputEl = context.querySelector('#username');
   var logInEl = context.querySelector('#logIn');
   var wsUrl = (location.protocol === 'https:' ? 'wss' : 'ws')
-            + '://test-ws-chat.herokuapp.com'
+            + '://test-ws-chat.herokuapp.com';
   var socket = new WebSocket(wsUrl, 'echo-protocol');
 
   var app = Elm.embed(Elm.Main, appEl, {
     receiveMessage: initMessage,
     username: ''
-  })
+  });
+
+  app.ports.scroll.subscribe(function(elementId) {
+    context.getElementById(elementId).scrollIntoView(false);
+  });
 
   socket.onopen = function (event) {
     app.ports.postMessage.subscribe(function(message) {
@@ -39,4 +43,4 @@
     modalEl.setAttribute('class', 'hidden');
   }
 
-})(document)
+})(document);
