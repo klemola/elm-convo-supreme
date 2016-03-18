@@ -8,7 +8,7 @@
   var modalEl = context.querySelector('#modal');
   var usernameInputEl = context.querySelector('#username');
   var logInEl = context.querySelector('#logIn');
-  var wsUrl = (location.protocol === 'https' ? 'wss' : 'ws')
+  var wsUrl = (location.protocol === 'https:' ? 'wss' : 'ws')
             + '://test-ws-chat.herokuapp.com'
   var socket = new WebSocket(wsUrl, 'echo-protocol');
 
