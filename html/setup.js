@@ -1,13 +1,16 @@
-(function (context) {
+(function(context) {
   var initMessage = {
-    content : '',
-    sentOn : 0,
-    sentBy : ''
+    content: '',
+    sentOn: 0,
+    sentBy: ''
   }
+  var scrollableElements = new Set();
+
   var appEl = context.querySelector('#app');
   var modalEl = context.querySelector('#modal');
   var usernameInputEl = context.querySelector('#username');
   var logInEl = context.querySelector('#logIn');
+
   var wsUrl = (location.protocol === 'https:' ? 'wss' : 'ws')
             + '://test-ws-chat.herokuapp.com';
   var socket = new WebSocket(wsUrl, 'echo-protocol');
@@ -18,10 +21,11 @@
   });
 
   app.ports.scroll.subscribe(function(elementId) {
-    context.getElementById(elementId).scrollIntoView(false);
+    scrollableElements.add(elementId);
+    scroll(elementId);
   });
 
-  socket.onopen = function (event) {
+  socket.onopen = function(event) {
     app.ports.postMessage.subscribe(function(message) {
       socket.send(JSON.stringify(message));
     });
@@ -38,9 +42,17 @@
     }
   };
 
-  function logIn () {
+  function logIn() {
     app.ports.username.send(usernameInputEl.value || 'WebUser');
     modalEl.setAttribute('class', 'hidden');
+    scrollableElements.forEach(scroll)
+  }
+
+  function scroll(elementId) {
+    var el = context.getElementById(elementId);
+    if (el && el.children.length > 0) {
+      el.children[el.children.length - 1].scrollIntoView();
+    }
   }
 
 })(document);
