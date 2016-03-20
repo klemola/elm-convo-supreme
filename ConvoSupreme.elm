@@ -1,7 +1,7 @@
 module ConvoSupreme (..) where
 
 import Html exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (class)
 import Time exposing (Time)
 import Effects exposing (Effects)
 import Task
@@ -102,53 +102,28 @@ triggerCreateMessage message =
 headerBlock : String -> Html
 headerBlock title =
   header
-    [ style
-        [ ( "flex-basis", "4rem" )
-        , ( "flex-shrink", "0" )
-        , ( "background", "#f5f5f5" )
-        , ( "border-bottom", "0.2rem solid #e5e5e5" )
-        , ( "text-align", "center" )
-        ]
-    ]
+    [ class "header-block" ]
     [ h2 [] [ text title ] ]
 
 
 messagesBlock : Messages.Model -> Html
 messagesBlock messages =
   div
-    [ style
-        [ ( "flex", "1" )
-        , ( "overflow-y", "scroll" )
-        ]
-    ]
+    [ class "messages-block" ]
     [ Messages.view messages ]
 
 
 inputBlock : Signal.Address Action -> InputArea.Model -> Html
 inputBlock address model =
   div
-    [ style
-        [ ( "flex-basis", "3rem" )
-        , ( "flex-shrink", "0" )
-        , ( "padding", "0.5rem" )
-        , ( "background", "#f5f5f5" )
-        , ( "border-top", "0.2rem solid #e5e5e5" )
-        ]
-    ]
+    [ class "input-block" ]
     [ InputArea.view (Signal.forwardTo address InputAreaAction) model ]
 
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   div
-    [ style
-        [ ( "color", "#333" )
-        , ( "display", "flex" )
-        , ( "flex-direction", "column" )
-        , ( "height", "100%" )
-        , ( "min-height", "100%" )
-        ]
-    ]
+    [ class "convo-supreme-container" ]
     [ headerBlock model.title
     , messagesBlock model.messagesModel
     , inputBlock address model.inputModel

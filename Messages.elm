@@ -1,7 +1,7 @@
 module Messages (..) where
 
 import Html exposing (..)
-import Html.Attributes exposing (style, id)
+import Html.Attributes exposing (id, class)
 import Effects exposing (Effects)
 import Message
 
@@ -34,11 +34,7 @@ update action model =
 view : Model -> Html
 view model =
   ul
-    [ style
-        [ ( "list-style", "none" )
-        , ( "padding", "0" )
-        , ( "margin", "0" )
-        ]
+    [ class "message-list"
     , id componentId
     ]
     (model

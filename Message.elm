@@ -1,7 +1,7 @@
 module Message (..) where
 
 import Html exposing (..)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (class)
 import Time exposing (..)
 import Date
 import String
@@ -46,30 +46,21 @@ msgTime timestamp =
 msgContent : Model -> Html
 msgContent model =
   span
-    [ style [ ( "flex", "5" ) ] ]
+    [ class "message-content" ]
     [ text (model.sentBy ++ ": " ++ model.content) ]
 
 
 msgSentOn : Time -> Html
 msgSentOn sentOn =
   span
-    [ style
-        [ ( "flex", "1" )
-        , ( "text-align", "right" )
-        ]
-    ]
+    [ class "message-timestamp" ]
     [ text (msgTime sentOn) ]
 
 
 view : Model -> Html
 view model =
   li
-    [ style
-        [ ( "padding", "0.5rem" )
-        , ( "display", "flex" )
-        , ( "border-bottom", "0.1rem solid #E5E5E5" )
-        ]
-    ]
+    [ class "message" ]
     [ msgContent model
     , msgSentOn model.sentOn
     ]

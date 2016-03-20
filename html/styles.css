@@ -4,16 +4,13 @@ html, body {
   padding: 0;
   margin: 0;
 }
-
 body {
   font-family: "San Francisco", "Helvetica Neue", Helvetica, sans-serif;
 }
-
 .hidden {
   display: none !important;
 }
-
-#modal {
+.modal {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -25,35 +22,93 @@ body {
   justify-content: center;
   text-align: center;
   background: #333;
+  background: rgba(33, 33, 33, 0.85);
   color: #f5f5f5;
 }
-
-#modalContent {
+.modal-content {
   width: 80%;
   margin: auto;
 }
-
-#modalContent input,
-#modalContent button {
+.modal-content input, .modal-content button {
   display: block;
   width: 100%;
   font-size: 1.2rem;
   padding: 0.5rem 5%;
   border-radius: 0.5rem;
   box-sizing: border-box;
-  border:none;
+  border: none;
 }
-
-#modalContent input {
+.modal-content input {
   background: #f5f5f5;
 }
-
-#modalContent button {
+.modal-content button {
   margin-top: 0.5rem;
   background: skyblue;
   color: #f5f5f5;
 }
-
+.convo-supreme-container {
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  height: 100;
+  min-height: 100;
+}
+.header-block {
+  flex-basis: 4rem;
+  flex-shrink: 0;
+  background: #f5f5f5;
+  border-bottom: 0.2rem solid #e5e5e5;
+  text-align: center;
+}
+.messages-block {
+  flex: 1;
+  overflow-y: scroll;
+}
+.input-block {
+  flex-basis: 3rem;
+  flex-shrink: 0;
+  padding: 0.5rem;
+  background: #f5f5f5;
+  border-top: 0.2rem solid #e5e5e5;
+}
+.message-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.message {
+  padding: 0.5rem;
+  display: flex;
+  border-bottom: 0.1rem solid #E5E5E5;
+}
+.message-content {
+  flex: 5;
+}
+.message-timestamp {
+  flex: 1;
+  text-align: right;
+}
+.input-area {
+  display: flex;
+}
+.message-area {
+  flex: 5;
+  height: 2.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 1em;
+  border: none;
+  border-radius: 0.5rem;
+  margin-right: 0.5rem;
+}
+.send-message {
+  flex: 1;
+  height: 3rem;
+  font-size: 1.5em;
+  border: none;
+  background: lightblue;
+  color: #345B80;
+  border-radius: 0.5rem;
+}
 #app {
   height: 100%;
   min-height: 100%;
