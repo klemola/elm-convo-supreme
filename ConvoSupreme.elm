@@ -103,7 +103,7 @@ headerBlock : String -> Html
 headerBlock title =
   header
     [ class "header-block" ]
-    [ h2 [] [ text title ] ]
+    [ h1 [] [ text title ] ]
 
 
 messagesBlock : Messages.Model -> Html

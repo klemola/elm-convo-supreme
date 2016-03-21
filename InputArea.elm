@@ -35,7 +35,7 @@ update action model =
 userInput : Signal.Address Action -> String -> Html
 userInput address model =
   input
-    [ class "message-area"
+    [ class "user-input"
     , placeholder "Your message..."
     , autofocus True
     , value model
