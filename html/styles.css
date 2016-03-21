@@ -66,7 +66,7 @@ body {
 }
 .messages-block {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: scroll;
 }
 .message-list {
   list-style: none;

@@ -50,8 +50,10 @@
 
   function scroll(elementId) {
     var el = context.getElementById(elementId);
-    if (el && el.children.length > 0) {
+    if (el.children && el.children.length > 0) {
       el.children[el.children.length - 1].scrollIntoView();
+    } else {
+      el.scrollIntoView();
     }
   }
 
