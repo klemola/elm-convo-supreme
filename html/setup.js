@@ -15,10 +15,7 @@
             + '://test-ws-chat.herokuapp.com';
   var socket = new WebSocket(wsUrl, 'echo-protocol');
 
-  var app = Elm.embed(Elm.Main, appEl, {
-    receiveMessage: initMessage,
-    username: ''
-  });
+  var app = Elm.Main.embed(appEl);
 
   app.ports.scroll.subscribe(function(elementId) {
     scrollableElements.add(elementId);

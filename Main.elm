@@ -1,44 +1,13 @@
-module Main (..) where
+module Main exposing (..)
 
-import Effects exposing (Never)
-import StartApp
-import Html exposing (Html)
-import Task
-import ConvoSupreme exposing (init, update, view)
-import Message
-import Scroll
+import Html.App as Html
+import ConvoSupreme exposing (init, update, view, subscriptions)
 
-
-app : StartApp.App ConvoSupreme.Model
-app =
-  StartApp.start
+main : Program Never
+main =
+  Html.program
     { init = init "Convo Supreme"
     , update = update
     , view = view
-    , inputs =
-        [ (Signal.map (\message -> ConvoSupreme.ReceiveMessage message) receiveMessage)
-        , (Signal.map (\username -> ConvoSupreme.SetUser username) username)
-        ]
+    , subscriptions = subscriptions
     }
-
-
-main : Signal Html
-main =
-  app.html
-
-
-port username : Signal String
-port receiveMessage : Signal Message.Model
-port postMessage : Signal Message.Model
-port postMessage =
-  Message.signal
-
-
-port scroll : Signal String
-port scroll =
-  Scroll.signal
-
-
-port tasks : Signal (Task.Task Never ())
-port tasks =
-  app.tasks

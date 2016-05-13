@@ -1,34 +1,16 @@
-module Message (..) where
+module Message exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Time exposing (..)
 import Date
 import String
-import Signal
-import Task
 
-
-type alias Model =
+type alias Message =
   { content : String
   , sentOn : Time
   , sentBy : String
   }
-
-
-box : Signal.Mailbox Model
-box =
-  Signal.mailbox (Model "" 0 "")
-
-
-signal : Signal Model
-signal =
-  box.signal
-
-
-post : Model -> Task.Task a ()
-post message =
-  Signal.send box.address message
 
 
 msgTime : Time -> String
@@ -43,21 +25,21 @@ msgTime timestamp =
     (pad (Date.hour date)) ++ ":" ++ (pad (Date.minute date))
 
 
-msgContent : Model -> Html
+msgContent : Message -> Html msg
 msgContent model =
   span
     [ class "message-content" ]
     [ text (model.sentBy ++ ": " ++ model.content) ]
 
 
-msgSentOn : Time -> Html
+msgSentOn : Time -> Html msg
 msgSentOn sentOn =
   span
     [ class "message-timestamp" ]
     [ text (msgTime sentOn) ]
 
 
-view : Model -> Html
+view : Message -> Html msg
 view model =
   li
     [ class "message" ]

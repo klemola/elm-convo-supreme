@@ -1,63 +1,96 @@
-module InputArea (..) where
+port module InputArea exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Signal exposing (Address)
-import Effects exposing (Effects)
-import Helpers exposing (onEnter)
+import Json.Decode as Json
+import Time exposing (Time)
+import Task
+import Message exposing (Message)
 
-
-type Action
+type Msg
   = Input String
-  | SendMessage String
+  | SendMessage
+  | PostMessage Time
+  | SetUser String
+  | Fail ()
 
 
 type alias Model =
-  String
+  { username: String
+  , input: String}
 
 
-init : Model
+port postMessage : Message -> Cmd msg
+port username : (String -> msg) -> Sub msg
+
+
+init : ( Model, Cmd Msg )
 init =
-  ""
+  (Model "" "", Cmd.none)
 
+subscriptions : Sub Msg
+subscriptions =
+  username SetUser
 
-update : Action -> Model -> ( Model, Effects Action )
-update action model =
-  case action of
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+  case msg of
     Input text ->
-      ( text, Effects.none )
+      ( { model | input = text }, Cmd.none )
 
-    SendMessage _ ->
-      ( init, Effects.none )
+    SendMessage ->
+      ( model, Task.perform Fail PostMessage Time.now )
+
+    PostMessage currentTime ->
+      let
+        message = Message model.input currentTime model.username
+      in
+        ( { model | input = "" }, postMessage message )
+
+    SetUser name ->
+      ( { model | username = name }, Cmd.none )
+
+    Fail _ ->
+      (model, Cmd.none)
 
 
-userInput : Signal.Address Action -> String -> Html
-userInput address model =
+onEnter : a -> a -> Attribute a
+onEnter fail success =
+  let
+    tagger code =
+      if code == 13 then success
+      else fail
+  in
+    on "keyup" (Json.map tagger keyCode)
+
+
+userInput : String -> Html Msg
+userInput model =
   input
     [ class "user-input"
     , placeholder "Your message..."
     , autofocus True
     , value model
-    , on "input" targetValue (\str -> Signal.message address (Input str))
-    , onEnter address (SendMessage model)
+    , onInput Input
+    , onEnter (Fail ()) SendMessage
     ]
     []
 
 
-sendMessage : Signal.Address Action -> String -> Html
-sendMessage address model =
+sendMessage : Html Msg
+sendMessage =
   button
-    [ onClick address (SendMessage model)
+    [ onClick SendMessage
     , class "send-message"
     ]
     [ text ">" ]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   div
     [ class "input-area" ]
-    [ userInput address model
-    , sendMessage address model
+    [ userInput model.input
+    , sendMessage
     ]
