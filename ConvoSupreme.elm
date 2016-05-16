@@ -3,11 +3,13 @@ port module ConvoSupreme exposing (..)
 import Html exposing (..)
 import Html.App as App
 import Html.Attributes exposing (class, id)
+import WebSocket
+import Json.Decode exposing (decodeString)
 import InputArea
-import Message exposing (Message)
+import Message exposing (Message, messageDecoder)
 
 type Msg
-  = ReceiveMessage Message
+  = ReceiveMessage String
   | InputAreaMsg InputArea.Msg
 
 
@@ -19,7 +21,6 @@ type alias Model =
 
 
 port scroll : String -> Cmd msg
-port receiveMessage : (Message -> msg) -> Sub msg
 
 
 init : String -> ( Model, Cmd Msg )
@@ -33,7 +34,7 @@ init title =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.batch
-    [ receiveMessage ReceiveMessage
+    [ WebSocket.listen "wss://test-ws-chat.herokuapp.com" ReceiveMessage
     , Sub.map InputAreaMsg InputArea.subscriptions
     ]
 
@@ -41,8 +42,15 @@ subscriptions model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
-    ReceiveMessage message ->
-        ( { model | messages = message :: model.messages }, scroll "messagesList" )
+    ReceiveMessage rawMessage ->
+        let
+          result = decodeString messageDecoder rawMessage
+        in
+          case result of
+            Ok value ->
+              ( { model | messages = value :: model.messages }, scroll "messagesList" )
+            Err msg ->
+              (model, Cmd.none)
 
     InputAreaMsg inputMsg ->
       let

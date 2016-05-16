@@ -5,6 +5,8 @@ import Html.Attributes exposing (class)
 import Time exposing (..)
 import Date
 import String
+import Json.Encode as Encode
+import Json.Decode as Decode exposing (Decoder, (:=))
 
 type alias Message =
   { content : String
@@ -12,6 +14,21 @@ type alias Message =
   , sentBy : String
   }
 
+
+messageDecoder : Decoder Message
+messageDecoder =
+  Decode.object3 Message
+    ("content" := Decode.string)
+    ("sentOn" := Decode.float)
+    ("sentBy" := Decode.string)
+
+encodeMessage : Message -> Encode.Value
+encodeMessage message =
+  Encode.object
+      [ ("content", Encode.string message.content)
+      , ("sentOn", Encode.float message.sentOn)
+      , ("sentBy", Encode.string message.sentBy)
+      ]
 
 msgTime : Time -> String
 msgTime timestamp =

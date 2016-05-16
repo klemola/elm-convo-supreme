@@ -4,9 +4,11 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
+import Json.Encode exposing (encode)
 import Time exposing (Time)
+import WebSocket
 import Task
-import Message exposing (Message)
+import Message exposing (Message, encodeMessage)
 
 type Msg
   = Input String
@@ -21,7 +23,6 @@ type alias Model =
   , input: String}
 
 
-port postMessage : Message -> Cmd msg
 port username : (String -> msg) -> Sub msg
 
 
@@ -45,8 +46,9 @@ update msg model =
     PostMessage currentTime ->
       let
         message = Message model.input currentTime model.username
+        encodedMessage = encode 0 (encodeMessage message)
       in
-        ( { model | input = "" }, postMessage message )
+        ( { model | input = "" }, WebSocket.send "wss://test-ws-chat.herokuapp.com" encodedMessage )
 
     SetUser name ->
       ( { model | username = name }, Cmd.none )
