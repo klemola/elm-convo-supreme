@@ -1,130 +1,102 @@
-module ConvoSupreme (..) where
+port module ConvoSupreme exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (class)
-import Time exposing (Time)
-import Effects exposing (Effects)
-import Task
-import Signal
-import TaskTutorial
+import Html.App as App
+import Html.Attributes exposing (class, id)
+import WebSocket
+import Json.Decode exposing (decodeString)
 import InputArea
-import Messages
-import Message
-import Scroll
+import Message exposing (Message, messageDecoder)
 
-
-type Action
-  = CreateMessage ( Time, String )
-  | ReceiveMessage Message.Model
-  | SetUser String
-  | InputAreaAction InputArea.Action
-  | NoOp
+type Msg
+  = ReceiveMessage String
+  | InputAreaMsg InputArea.Msg
 
 
 type alias Model =
   { title : String
-  , username : String
+  , messages : List Message
   , inputModel : InputArea.Model
-  , messagesModel : Messages.Model
   }
 
 
-init : String -> ( Model, Effects Action )
+port scroll : String -> Cmd msg
+
+
+init : String -> ( Model, Cmd Msg )
 init title =
-  ( (Model title "" "" Messages.init), Effects.none )
+  let
+    (inputModel, inputInitFx) = InputArea.init
+  in
+    ( (Model title [] inputModel ), Cmd.map InputAreaMsg inputInitFx )
 
 
-update : Action -> Model -> ( Model, Effects Action )
-update action model =
-  case action of
-    CreateMessage ( time, content ) ->
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.batch
+    [ WebSocket.listen "wss://test-ws-chat.herokuapp.com" ReceiveMessage
+    , Sub.map InputAreaMsg InputArea.subscriptions
+    ]
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+  case msg of
+    ReceiveMessage rawMessage ->
+        let
+          result = decodeString messageDecoder rawMessage
+        in
+          case result of
+            Ok value ->
+              ( { model | messages = value :: model.messages }, scroll "messagesList" )
+            Err msg ->
+              (model, Cmd.none)
+
+    InputAreaMsg inputMsg ->
       let
-        task =
-          Message.post (Message.Model content time model.username)
+        ( updatedModel, fx ) =
+          InputArea.update inputMsg model.inputModel
       in
-        ( model, (doNothing task) )
-
-    ReceiveMessage message ->
-      let
-        ( messagesModel, fx ) =
-          Messages.update (Messages.AddMessage message) model.messagesModel
-
-        task =
-          Scroll.scroll Messages.componentId
-      in
-        ( { model | messagesModel = messagesModel }, (doNothing task) )
-
-    SetUser name ->
-      ( { model | username = name }, Effects.none )
-
-    InputAreaAction inputAction ->
-      handleInput inputAction model
-
-    _ ->
-      ( model, Effects.none )
+        ( { model | inputModel = updatedModel }, Cmd.map InputAreaMsg fx)
 
 
-doNothing : Task.Task Effects.Never a -> Effects Action
-doNothing task =
-  task
-    |> Effects.task
-    |> Effects.map (always NoOp)
-
-
-handleInput : InputArea.Action -> Model -> ( Model, Effects Action )
-handleInput action model =
-  case action of
-    InputArea.SendMessage content ->
-      ( { model
-          | inputModel = InputArea.init
-        }
-      , triggerCreateMessage content
-      )
-
-    InputArea.Input content ->
-      let
-        ( inputModel, fx ) =
-          InputArea.update action content
-      in
-        ( { model | inputModel = inputModel }, Effects.none )
-
-
-triggerCreateMessage : String -> Effects Action
-triggerCreateMessage message =
-  TaskTutorial.getCurrentTime
-    |> (flip Task.andThen)
-        (\time ->
-          Task.succeed (CreateMessage ( time, message ))
-        )
-    |> Effects.task
-
-
-headerBlock : String -> Html
+headerBlock : String -> Html msg
 headerBlock title =
   header
     [ class "header-block" ]
     [ h1 [] [ text title ] ]
 
 
-messagesBlock : Messages.Model -> Html
+messagesView : List Message -> Html msg
+messagesView messages =
+  ul
+    [ class "message-list"
+    , id "messagesList"
+    ]
+    (messages
+      |> List.reverse
+      |> List.map Message.view
+    )
+
+messagesBlock : List Message -> Html msg
 messagesBlock messages =
   div
     [ class "messages-block" ]
-    [ Messages.view messages ]
+    [ messagesView messages ]
 
 
-inputBlock : Signal.Address Action -> InputArea.Model -> Html
-inputBlock address model =
+inputBlock : InputArea.Model -> Html Msg
+inputBlock model =
   div
     [ class "input-block" ]
-    [ InputArea.view (Signal.forwardTo address InputAreaAction) model ]
+    [ App.map InputAreaMsg (InputArea.view model) ]
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html Msg
+view model =
   div
     [ class "convo-supreme-container" ]
     [ headerBlock model.title
-    , messagesBlock model.messagesModel
-    , inputBlock address model.inputModel
+    , messagesBlock model.messages
+    , inputBlock model.inputModel
     ]
