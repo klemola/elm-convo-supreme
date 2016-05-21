@@ -8,6 +8,7 @@ import Json.Decode exposing (decodeString)
 import InputArea
 import Message exposing (Message, messageDecoder)
 
+
 type Msg
   = ReceiveMessage String
   | InputAreaMsg InputArea.Msg
@@ -26,9 +27,10 @@ port scroll : String -> Cmd msg
 init : String -> ( Model, Cmd Msg )
 init title =
   let
-    (inputModel, inputInitFx) = InputArea.init
+    ( inputModel, inputInitFx ) =
+      InputArea.init
   in
-    ( (Model title [] inputModel ), Cmd.map InputAreaMsg inputInitFx )
+    ( (Model title [] inputModel), Cmd.map InputAreaMsg inputInitFx )
 
 
 subscriptions : Model -> Sub Msg
@@ -43,27 +45,28 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
     ReceiveMessage rawMessage ->
-        let
-          result = decodeString messageDecoder rawMessage
-        in
-          case result of
-            Ok value ->
-              ( { model | messages = value :: model.messages }, scroll "messagesList" )
-            Err msg ->
-              (model, Cmd.none)
+      let
+        result =
+          decodeString messageDecoder rawMessage
+      in
+        case result of
+          Ok value ->
+            ( { model | messages = value :: model.messages }, scroll "messagesList" )
+
+          Err msg ->
+            ( model, Cmd.none )
 
     InputAreaMsg inputMsg ->
       let
         ( updatedModel, fx ) =
           InputArea.update inputMsg model.inputModel
       in
-        ( { model | inputModel = updatedModel }, Cmd.map InputAreaMsg fx)
+        ( { model | inputModel = updatedModel }, Cmd.map InputAreaMsg fx )
 
 
 headerBlock : String -> Html msg
 headerBlock title =
-  header
-    [ class "header-block" ]
+  header [ class "header-block" ]
     [ h1 [] [ text title ] ]
 
 
@@ -78,24 +81,22 @@ messagesView messages =
       |> List.map Message.view
     )
 
+
 messagesBlock : List Message -> Html msg
 messagesBlock messages =
-  div
-    [ class "messages-block" ]
+  div [ class "messages-block" ]
     [ messagesView messages ]
 
 
 inputBlock : InputArea.Model -> Html Msg
 inputBlock model =
-  div
-    [ class "input-block" ]
+  div [ class "input-block" ]
     [ App.map InputAreaMsg (InputArea.view model) ]
 
 
 view : Model -> Html Msg
 view model =
-  div
-    [ class "convo-supreme-container" ]
+  div [ class "convo-supreme-container" ]
     [ headerBlock model.title
     , messagesBlock model.messages
     , inputBlock model.inputModel

@@ -8,6 +8,7 @@ import String
 import Json.Encode as Encode
 import Json.Decode as Decode exposing (Decoder, (:=))
 
+
 type alias Message =
   { content : String
   , sentOn : Time
@@ -22,13 +23,15 @@ messageDecoder =
     ("sentOn" := Decode.float)
     ("sentBy" := Decode.string)
 
+
 encodeMessage : Message -> Encode.Value
 encodeMessage message =
   Encode.object
-      [ ("content", Encode.string message.content)
-      , ("sentOn", Encode.float message.sentOn)
-      , ("sentBy", Encode.string message.sentBy)
-      ]
+    [ ( "content", Encode.string message.content )
+    , ( "sentOn", Encode.float message.sentOn )
+    , ( "sentBy", Encode.string message.sentBy )
+    ]
+
 
 msgTime : Time -> String
 msgTime timestamp =
@@ -44,22 +47,19 @@ msgTime timestamp =
 
 msgContent : Message -> Html msg
 msgContent model =
-  span
-    [ class "message-content" ]
+  span [ class "message-content" ]
     [ text (model.sentBy ++ ": " ++ model.content) ]
 
 
 msgSentOn : Time -> Html msg
 msgSentOn sentOn =
-  span
-    [ class "message-timestamp" ]
+  span [ class "message-timestamp" ]
     [ text (msgTime sentOn) ]
 
 
 view : Message -> Html msg
 view model =
-  li
-    [ class "message" ]
+  li [ class "message" ]
     [ msgContent model
     , msgSentOn model.sentOn
     ]

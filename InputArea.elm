@@ -10,6 +10,7 @@ import WebSocket
 import Task
 import Message exposing (Message, encodeMessage)
 
+
 type Msg
   = Input String
   | SendMessage
@@ -19,8 +20,9 @@ type Msg
 
 
 type alias Model =
-  { username: String
-  , input: String}
+  { username : String
+  , input : String
+  }
 
 
 port username : (String -> msg) -> Sub msg
@@ -28,11 +30,13 @@ port username : (String -> msg) -> Sub msg
 
 init : ( Model, Cmd Msg )
 init =
-  (Model "" "", Cmd.none)
+  ( Model "" "", Cmd.none )
+
 
 subscriptions : Sub Msg
 subscriptions =
   username SetUser
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -45,8 +49,11 @@ update msg model =
 
     PostMessage currentTime ->
       let
-        message = Message model.input currentTime model.username
-        encodedMessage = encode 0 (encodeMessage message)
+        message =
+          Message model.input currentTime model.username
+
+        encodedMessage =
+          encode 0 (encodeMessage message)
       in
         ( { model | input = "" }, WebSocket.send "wss://test-ws-chat.herokuapp.com" encodedMessage )
 
@@ -54,15 +61,17 @@ update msg model =
       ( { model | username = name }, Cmd.none )
 
     Fail _ ->
-      (model, Cmd.none)
+      ( model, Cmd.none )
 
 
 onEnter : a -> a -> Attribute a
 onEnter fail success =
   let
     tagger code =
-      if code == 13 then success
-      else fail
+      if code == 13 then
+        success
+      else
+        fail
   in
     on "keyup" (Json.map tagger keyCode)
 
@@ -91,8 +100,7 @@ sendMessage =
 
 view : Model -> Html Msg
 view model =
-  div
-    [ class "input-area" ]
+  div [ class "input-area" ]
     [ userInput model.input
     , sendMessage
     ]
