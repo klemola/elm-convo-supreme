@@ -12,17 +12,17 @@ import Message exposing (Message, encodeMessage)
 
 
 type Msg
-  = Input String
-  | SendMessage
-  | PostMessage Time
-  | SetUser String
-  | Fail ()
+    = Input String
+    | SendMessage
+    | PostMessage Time
+    | SetUser String
+    | Fail ()
 
 
 type alias Model =
-  { username : String
-  , input : String
-  }
+    { username : String
+    , input : String
+    }
 
 
 port username : (String -> msg) -> Sub msg
@@ -30,77 +30,77 @@ port username : (String -> msg) -> Sub msg
 
 init : ( Model, Cmd Msg )
 init =
-  ( Model "" "", Cmd.none )
+    ( Model "" "", Cmd.none )
 
 
 subscriptions : Sub Msg
 subscriptions =
-  username SetUser
+    username SetUser
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-  case msg of
-    Input text ->
-      ( { model | input = text }, Cmd.none )
+    case msg of
+        Input text ->
+            ( { model | input = text }, Cmd.none )
 
-    SendMessage ->
-      ( model, Task.perform Fail PostMessage Time.now )
+        SendMessage ->
+            ( model, Task.perform PostMessage Time.now )
 
-    PostMessage currentTime ->
-      let
-        message =
-          Message model.input currentTime model.username
+        PostMessage currentTime ->
+            let
+                message =
+                    Message model.input currentTime model.username
 
-        encodedMessage =
-          encode 0 (encodeMessage message)
-      in
-        ( { model | input = "" }, WebSocket.send "wss://test-ws-chat.herokuapp.com" encodedMessage )
+                encodedMessage =
+                    encode 0 (encodeMessage message)
+            in
+                ( { model | input = "" }, WebSocket.send "wss://test-ws-chat.herokuapp.com" encodedMessage )
 
-    SetUser name ->
-      ( { model | username = name }, Cmd.none )
+        SetUser name ->
+            ( { model | username = name }, Cmd.none )
 
-    Fail _ ->
-      ( model, Cmd.none )
+        Fail _ ->
+            ( model, Cmd.none )
 
 
 onEnter : a -> a -> Attribute a
 onEnter fail success =
-  let
-    tagger code =
-      if code == 13 then
-        success
-      else
-        fail
-  in
-    on "keyup" (Json.map tagger keyCode)
+    let
+        tagger code =
+            if code == 13 then
+                success
+            else
+                fail
+    in
+        on "keyup" (Json.map tagger keyCode)
 
 
 userInput : String -> Html Msg
 userInput model =
-  input
-    [ class "user-input"
-    , placeholder "Your message..."
-    , autofocus True
-    , value model
-    , onInput Input
-    , onEnter (Fail ()) SendMessage
-    ]
-    []
+    input
+        [ class "user-input"
+        , placeholder "Your message..."
+        , autofocus True
+        , value model
+        , onInput Input
+        , onEnter (Fail ()) SendMessage
+        ]
+        []
 
 
 sendMessage : Html Msg
 sendMessage =
-  button
-    [ onClick SendMessage
-    , class "send-message"
-    ]
-    [ text ">" ]
+    button
+        [ onClick SendMessage
+        , class "send-message"
+        ]
+        [ text ">" ]
 
 
 view : Model -> Html Msg
 view model =
-  div [ class "input-area" ]
-    [ userInput model.input
-    , sendMessage
-    ]
+    div [ class "input-area" ]
+        [ userInput model.input
+        , sendMessage
+        ]

@@ -2,7 +2,7 @@
     "name": "Convo Supreme",
     "repository": "https://github.com/klemola/elm-convo-supreme",
     "env": {
-        "ELM_COMPILE": "elm make src/Main.elm --output=html/elm.js"
+        "ELM_COMPILE": "elm make src/Main.elm --output=src/html/elm.js"
     },
     "buildpacks": [
         {
